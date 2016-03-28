@@ -569,7 +569,7 @@ namespace Passbook.Generator
 			if (RelevantDate.HasValue)
 			{
 				writer.WritePropertyName("relevantDate");
-				writer.WriteValue(RelevantDate.Value.ToString("o"));
+				writer.WriteValue(RelevantDate.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mmZ"));
 			}
 
 			if (MaxDistance.HasValue)
@@ -727,7 +727,7 @@ namespace Passbook.Generator
 			if (ExpirationDate.HasValue)
 			{
 				writer.WritePropertyName("expirationDate");
-				writer.WriteValue(ExpirationDate.Value.ToString("o"));
+				writer.WriteValue(ExpirationDate.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mmZ"));
 			}
 
 			if (Voided.HasValue)
