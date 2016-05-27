@@ -72,6 +72,7 @@
     <Compile Include="Exceptions\RequiredFieldValueMissingException.cs" />
     <Compile Include="Fields\BarCode.cs" />
     <Compile Include="Fields\BarcodeType.cs" />
+    <Compile Include="Fields\BarCodes.cs" />
     <Compile Include="Fields\DateField.cs" />
     <Compile Include="Fields\Field.cs" />
     <Compile Include="Fields\NumberField.cs" />

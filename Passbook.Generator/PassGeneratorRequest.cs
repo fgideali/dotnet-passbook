@@ -316,9 +316,14 @@ namespace Passbook.Generator
 		public List<Field> BackFields { get; private set; }
 
 		/// <summary>
-		/// Optional. Information specific to barcodes.
+		/// Optional. Information specific to barcode.
 		/// </summary>
 		public BarCode Barcode { get; private set; }
+
+		/// <summary>
+		/// Optional. Information specific to barcodes.
+		/// </summary>
+		public BarCodes Barcodes { get; private set; }
 
 		/// <summary>
 		/// Required. Pass type.
@@ -472,6 +477,17 @@ namespace Passbook.Generator
 				Message = message,
 				Encoding = encoding,
 				AlternateText = null
+			};
+		}
+
+		public void AddBarCodes(string message, BarcodeType type, string encoding, string altText)
+		{
+			Barcodes = new BarCodes()
+			{
+				Type = type,
+				Message = message,
+				Encoding = encoding,
+				AlternateText = altText
 			};
 		}
 
@@ -637,6 +653,29 @@ namespace Passbook.Generator
 				}
 
 				writer.WriteEndObject();
+			}
+
+			if (Barcodes != null)
+			{
+				writer.WritePropertyName("barcodes");
+				writer.WriteStartArray();
+				
+				writer.WriteStartObject();
+				writer.WritePropertyName("format");
+				writer.WriteValue(Barcodes.Type.ToString());
+				writer.WritePropertyName("message");
+				writer.WriteValue(Barcodes.Message);
+				writer.WritePropertyName("messageEncoding");
+				writer.WriteValue(Barcodes.Encoding);
+
+				if (!String.IsNullOrEmpty(Barcodes.AlternateText))
+				{
+					writer.WritePropertyName("altText");
+					writer.WriteValue(Barcodes.AlternateText);
+				}
+
+				writer.WriteEndObject();
+				writer.WriteEndArray();
 			}
 		}
 
