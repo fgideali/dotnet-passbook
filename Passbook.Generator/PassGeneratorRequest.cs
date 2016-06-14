@@ -316,14 +316,14 @@ namespace Passbook.Generator
 		public List<Field> BackFields { get; private set; }
 
 		/// <summary>
-		/// Optional. Information specific to barcode.
+		/// Optional. Information specific to barcode. (Pre 9.0)
 		/// </summary>
 		public BarCode Barcode { get; private set; }
 
 		/// <summary>
-		/// Optional. Information specific to barcodes.
+		/// Optional. Information specific to barcodes. (Post 9.0)
 		/// </summary>
-		public BarCodes Barcodes { get; private set; }
+		public IList<BarCode> Barcodes { get; private set; }
 
 		/// <summary>
 		/// Required. Pass type.
@@ -458,37 +458,13 @@ namespace Passbook.Generator
 			this.BackFields.Add(field);
 		}
 
-		public void AddBarCode(string message, BarcodeType type, string encoding, string altText)
+		public void SetBarCode(BarCode barcode)
 		{
-			Barcode = new BarCode()
-			{
-				Type = type,
-				Message = message,
-				Encoding = encoding,
-				AlternateText = altText
-			};       
+			Barcode = barcode;
 		}
-
-		public void AddBarCode(string message, BarcodeType type, string encoding)
+		public void SetBarCodes(IList<BarCode> barcodes)
 		{
-			Barcode = new BarCode() 
-			{
-				Type = type,
-				Message = message,
-				Encoding = encoding,
-				AlternateText = null
-			};
-		}
-
-		public void AddBarCodes(string message, BarcodeType type, string encoding, string altText)
-		{
-			Barcodes = new BarCodes()
-			{
-				Type = type,
-				Message = message,
-				Encoding = encoding,
-				AlternateText = altText
-			};
+			Barcodes = barcodes;
 		}
 
 		public void AddLocation(double latitude, double longitude)
@@ -575,6 +551,7 @@ namespace Passbook.Generator
 			CloseStyleSpecificKey(writer);
 
 			WriteBarcode(writer);
+			WriteBarcodes(writer);
 			WriteUrls(writer);
 
 			writer.WriteEndObject();
@@ -632,6 +609,7 @@ namespace Passbook.Generator
 			}
 		}
 
+		//Still used for Pre IOS 9.0, we use the last fallback specified in the barcodes list
 		private void WriteBarcode(JsonWriter writer)
 		{
 			if (Barcode != null)
@@ -654,27 +632,34 @@ namespace Passbook.Generator
 
 				writer.WriteEndObject();
 			}
+		}
 
-			if (Barcodes != null)
+		//Used since IOS 9.0, list of barcodes with fallback in order
+		private void WriteBarcodes(JsonWriter writer)
+		{
+			if (Barcodes != null && Barcodes.Any())
 			{
 				writer.WritePropertyName("barcodes");
 				writer.WriteStartArray();
-				
-				writer.WriteStartObject();
-				writer.WritePropertyName("format");
-				writer.WriteValue(Barcodes.Type.ToString());
-				writer.WritePropertyName("message");
-				writer.WriteValue(Barcodes.Message);
-				writer.WritePropertyName("messageEncoding");
-				writer.WriteValue(Barcodes.Encoding);
 
-				if (!String.IsNullOrEmpty(Barcodes.AlternateText))
+				foreach (var barcode in Barcodes)
 				{
-					writer.WritePropertyName("altText");
-					writer.WriteValue(Barcodes.AlternateText);
-				}
+					writer.WriteStartObject();
+					writer.WritePropertyName("format");
+					writer.WriteValue(barcode.Type.ToString());
+					writer.WritePropertyName("message");
+					writer.WriteValue(barcode.Message);
+					writer.WritePropertyName("messageEncoding");
+					writer.WriteValue(barcode.Encoding);
 
-				writer.WriteEndObject();
+					if (!String.IsNullOrEmpty(barcode.AlternateText))
+					{
+						writer.WritePropertyName("altText");
+						writer.WriteValue(barcode.AlternateText);
+					}
+
+					writer.WriteEndObject();
+				}
 				writer.WriteEndArray();
 			}
 		}

@@ -30,6 +30,9 @@ namespace Passbook.Generator.Fields
 
 		/// <summary>
 		/// Code128
+		/// do not use in "barcode", 
+		/// can be used in "barcodes",
+		/// requires at least a PKBarcodeFormatText fallback for apple watch
 		/// </summary>
 		PKBarcodeFormatCode128 = 128,
     } 
